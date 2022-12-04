@@ -17,14 +17,17 @@ server.listen(3000, ()=> {
 });
 
 io.on('connection', (socket) => {
+  socket.broadcast.emit("newPlayer");
 	console.log('A user just connected.');
     socket.on('mySpecs', (objs) => {
       socket.broadcast.emit('getObjs', objs);
     })
     socket.on('setBullets', (b) => {
       socket.broadcast.emit('getBullets', b);
-      
     });
+    socket.on('restart', ()=> {
+      socket.broadcast.emit('restart');
+    })
 
 
 

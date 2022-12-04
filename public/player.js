@@ -49,7 +49,6 @@ class Player {
         }
     }
     update(){
-        
     }
     shoot(){
         if(!this.isShoting){
@@ -104,10 +103,10 @@ class Bullet {
 
 }
 
+
 let randX = Math.floor((Math.random()/10) * 600) * 10;
 let randY = Math.floor((Math.random()/10) * 400) * 10;
 
-console.log(randX, randY);
 
 const p1 = new Player(randX, randY, "rgb(0,0,200)");
 const p2 = new Player(5, 5, "rgb(250,250,250)");
@@ -116,7 +115,6 @@ socket.emit('mySpecs', [randX, randY]);
 
 toBeRender.push(p1);
 toBeRender.push(p2);
-
 function main(){
     document.addEventListener('keydown', logKey);
     function logKey(e) {
@@ -146,6 +144,12 @@ function main(){
     window.requestAnimationFrame(mainloop);
 }
 function mainloop(){
+    socket.on('restart', () => {
+        location.reload();
+    })
+    socket.on('newPlayer', () => { 
+        socket.emit('mySpecs', [p1.x, p1.y]);
+    })
     socket.on('getObjs', (enemy) => {
         p2.x = enemy[0];
         p2.y = enemy[1];
@@ -161,6 +165,15 @@ function mainloop(){
     if(p1.isColliding){
         p1.x = 700;
         socket.emit('mySpecs', [700, 700]);
+        const button = document.createElement('button');
+        button.innerText = 'Try again!';
+        button.addEventListener('click', () => {
+            socket.emit('restart');
+            location.reload();
+          })
+        document.body.appendChild(button)
+        p1.isColliding = false;
+
     }
 
     flush();
@@ -170,7 +183,6 @@ function mainloop(){
     toBeRender.forEach((b, i) => {
         b.draw();
         b.update();
-        //console.log(b.x);
         if(-1 > b.x || b.x > 601 || -1 > b.y ||b.y > 401){
             toBeRender.splice(i,1);
             p1.isShoting = false;
